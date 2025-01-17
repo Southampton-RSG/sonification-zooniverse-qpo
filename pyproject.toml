@@ -1,0 +1,17 @@
+[project]
+name = "tess-audio-utils"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "mind-the-gaps",
+    "numpy<2",
+    "pyfftw>=0.15.0",
+    "setuptools>=75.8.0",
+    "strauss",
+]
+
+[tool.uv.sources]
+strauss = { git = "https://github.com/james-trayford/strauss.git" }
+mind-the-gaps = { git = "https://github.com/smangham/mind_the_gaps.git" }
