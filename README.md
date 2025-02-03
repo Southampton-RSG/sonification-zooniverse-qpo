@@ -1,3 +1,11 @@
+## UV
+
+To run the notebooks using UV:
+
+```
+uv run --with jupyter jupyter lab
+```
+
 # tess-audio-utils
 Python functions for sonification of TESS light curves. Requires Python 3.8. Uses [STRAUSS](https://github.com/james-trayford/strauss) to generate audio from `x,y` data for each light curve, and [`conda`](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html) for package management.
 
