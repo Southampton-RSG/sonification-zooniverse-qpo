@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF_8">
+    <title>Sonified Simulated QPO Lightcurves</title>
+</head>
+<body>
+    <h1>
+        Sonified Simulated QPO Lightcurves
+    </h1>
+    <h2>
+        Simulated Lightcurves
+    </h2>
+    <p>
+        The lightcurves were produced using the Mind The Gaps Python package,
+        and include a Bending Powerlaw red noise component and Lorentzian periodic component.
+        They represent a year's worth of observations taken on a 3-day cadence,
+        roughly approximating the LSST survey schedule.
+    </p>
+    <h2>
+        Discrete Sonifications
+    </h2>
+    <p>
+        For our trial run, we've represented each observation in the lightcurve as a discrete note,
+        where the pitch represents the count rate of the detector.
+        Higher count rates result in higher pitches.
+    </p>
+    <h3>
+        Varying Instruments
+    </h3>
+    <p>
+        We've tested a few different instruments,
+        and if you've got any recommendations for more, or even specific SoundFonts, we'd welcome them!
+        The piano and longer flute are probably the most pleasant-sounding,
+        though whether or not they're useful is another question.
+    </p>
+    <ul>
+        <li>
+            Flute: <audio controls><source src="static/audio/flute_long_tempo_6.aac" type="audio/mpeg"></audio>
+        </li>
+        <li>
+            Staccato Flute: <audio controls><source src="static/audio/flute_staccato_tempo_6.aac" type="audio/mpeg"></audio>
+        </li>
+        <li>
+            Guitar: <audio controls><source src="static/audio/guitar_tempo_6.aac" type="audio/mpeg"></audio>
+        </li>
+        <li>
+            Piano: <audio controls><source src="static/audio/piano_tempo_6.aac" type="audio/mpeg"></audio>
+        </li>
+    </ul>
+    <h3>
+        Varying Tempo
+    </h3>
+    <p>
+        We've tested a range of tempos as well.
+        The 360BPM one sounds best to my ears, but again that's probably not helpful.
+        There's likely a strong link between instrument and appropriate tempo,
+        but these examples just use the flute and piano from earlier.
+    </p>
+    <ul>
+        <li>
+            Flute, 240 BPM: <audio controls><source src="static/audio/flute_long_tempo_4.aac" type="audio/mpeg"></audio>
+        </li>
+        <li>
+            Flute, 360 BPM: <audio controls><source src="static/audio/flute_long_tempo_6.aac" type="audio/mpeg"></audio>
+        </li>
+        <li>
+            Flute, 480 BPM: <audio controls><source src="static/audio/flute_long_tempo_8.aac" type="audio/mpeg"></audio>
+        </li>
+        <li>
+            Piano, 240 BPM: <audio controls><source src="static/audio/piano_tempo_4.aac" type="audio/mpeg"></audio>
+        </li>
+        <li>
+            Piano, 360 BPM: <audio controls><source src="static/audio/piano_tempo_6.aac" type="audio/mpeg"></audio>
+        </li>
+        <li>
+            Piano, 480 BPM: <audio controls><source src="static/audio/piano_tempo_8.aac" type="audio/mpeg"></audio>
+        </li>
+    </ul>
+    <h2>
+        Continuous Sonification
+    </h2>
+    <p>
+        We've also tried out representing the sound as a continuous tone, shifting in pitch,
+        with linear interpolation between the values at observations.
+        It just uses a triangle wave synth, as used in the Strauss examples.
+    </p>
+    <audio controls><source src="static/audio/synth_continuous.aac" type="audio/mpeg"></audio>
+    <p>
+        To my ears, this sounds fairly unpleasant, but I'm not sure if that means it's not useful.
+        We've explored trying to get pitch-shifted SoundFonts in,
+        but that seems to be a bit more difficult.
+    </p>
+</body>
+</html>
