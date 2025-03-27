@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/sonification-zooniverse-preproto.iml" filepath="$PROJECT_DIR$/.idea/sonification-zooniverse-preproto.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/sonification-zooniverse-qpo.iml" filepath="$PROJECT_DIR$/.idea/sonification-zooniverse-qpo.iml" />
     </modules>
   </component>
 </project>

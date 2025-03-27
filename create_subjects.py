@@ -1,8 +1,8 @@
 import os
 from panoptes_client import Panoptes, Subject, SubjectSet
 from dotenv import load_dotenv
-
 load_dotenv()
+
 
 CLIENT_ID = '7fecf1c5d5a2e1d7c9a6ccf0344e5ae9f1fb6ad7b412192d31182c6cdb3da8ed'
 CLIENT_SECRET = os.getenv('CLIENT_SECRET')

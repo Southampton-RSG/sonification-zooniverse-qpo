@@ -162,3 +162,11 @@ cython_debug/
 # data
 mp3/
 wav/
+
+# Non-default settings, including secrets like username and password
+settings.ini
+
+# Generated files like logs and subject sets
+logs/*.log
+data/zooniverse/
+*.pickle
