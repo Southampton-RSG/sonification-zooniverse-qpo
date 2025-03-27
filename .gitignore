@@ -170,3 +170,4 @@ settings.ini
 logs/*.log
 data/zooniverse/
 *.pickle
+notebooks/iframe_figures/

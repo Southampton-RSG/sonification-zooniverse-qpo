@@ -51,7 +51,6 @@ def main():
         'subjects_created': 0,
     }
 
-
     for subject_set_directory in Path(zooniverse_path).iterdir():
         if subject_set_directory.is_dir():
             # Open the metadata for this subject set, saved inside the directory

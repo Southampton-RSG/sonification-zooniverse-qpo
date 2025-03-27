@@ -11,26 +11,6 @@ from astropy.timeseries import TimeSeries
 from plotly.graph_objects import Figure, Scatter
 
 
-def metadata_to_title(
-        meta: Dict[str, List[str]],
-) -> str:
-    """
-    Given the metadata dictionary from one of the tables we generate earlier,
-    produces a plot title from it.
-
-    :param meta: The metadata dictionary, containing the keys
-        `type`, `period` and `variance_fraction`
-    :return: A string title describing the base model and its properties
-    """
-    return ' & '.join(
-        [
-            f"{model_type}, period {period.to(u.day)}, variance fraction of mean {variance_fraction}" for model_type, period, variance_fraction in zip(
-                meta['type'], meta['period'], meta['variance_fraction']
-            )
-        ]
-    )
-
-
 def plot_lightcurve(
         lightcurve: TimeSeries,
         time_units: u.UnitBase = u.day,
@@ -77,7 +57,7 @@ def plot_lightcurve(
             )
         ],
         layout={
-            "title": title if title else metadata_to_title(lightcurve.meta),
+            "title": lightcurve.meta['model_definition'].get_title(),
             "xaxis_title": f"Time ({time_units})",
             "yaxis_title": f"Count rate ({rate_units})"
         }
@@ -85,7 +65,7 @@ def plot_lightcurve(
 
     if period:
         if period is 'auto':
-            period = lightcurve.meta["period"][0]
+            period = lightcurve.meta['model_definition'].get_period()
 
         periods: NDArray[floating] = np.arange(
             time[0], time[-1], step=period.jd

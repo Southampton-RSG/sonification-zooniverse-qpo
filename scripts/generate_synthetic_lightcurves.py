@@ -2,93 +2,40 @@
 
 """
 import copy
-from logging import Logger, FileHandler, DEBUG, getLogger, Formatter, StreamHandler
-from pathlib import Path
 from configparser import ConfigParser
+from logging import Logger, FileHandler, DEBUG, getLogger, Formatter
+from pathlib import Path
+from typing import Any, Dict
 
-import yaml
 from astropy import units as u
-from astropy.units import Quantity
 from astropy.time import TimeDelta
-from astropy.timeseries import TimeSeries
 
-from mind_the_gaps.models.psd_models import Lorentzian, BendingPowerlaw
-
-from plotly.graph_objs import Figure
+from mind_the_gaps.models.psd_models import BendingPowerlaw
 
 from strauss.generator import Sampler
-from strauss.sonification import Sonification
 
-from zooniverse_qpo.metadata import write_subject_metadata_to_yaml
-from zooniverse_qpo.sonification import generate_sonification_from_lightcurve, write_sonification_to_mp3
-from zooniverse_qpo.synthetic import generate_synthetic_lightcurve
-from zooniverse_qpo.plotting import plot_lightcurve
+from zooniverse_qpo.synthetic import generate_synthetic_subjects
+from zooniverse_qpo.model_definition import ModelDefinition
 
 
 def main():
     config: ConfigParser = ConfigParser()
     config.read(
-        [
-            'settings.default.ini', 'settings.ini'
-        ]
+        ['settings.default.ini', 'settings.ini']
     )
+    paths: Dict[str, Path] = {
+        key: Path(value) for key, value in config['PATHS'].items()
+    }
 
     logger: Logger = getLogger('zooniverse_qpo')
     logger.setLevel(DEBUG)
 
     file_handler: FileHandler = FileHandler(Path(config['PATHS']['logs']) / 'generate_synthetic_lightcurves.log')
-    # stream_handler: StreamHandler = StreamHandler()
-
     log_formatter: Formatter = Formatter("%(asctime)s - %(levelname)s - %(name)s - %(message)s")
     file_handler.setFormatter(log_formatter)
-    # stream_handler.setFormatter(log_formatter)
-
     logger.addHandler(file_handler)
-    # logger.addHandler(stream_handler)
 
-    standard_campaign_length: Quantity = TimeDelta(360, format='jd')
-    standard_period: TimeDelta = TimeDelta(21, format='jd')
-    standard_cadence: TimeDelta = TimeDelta(3, format='jd')
-    standard_rate_mean: Quantity = 25 * u.s ** -1
-    standard_coherence: float = 5
-
-    lightcurve_bpl: TimeSeries = generate_synthetic_lightcurve(
-        campaign_length=standard_campaign_length,
-        observation_cadence=standard_cadence,
-        rate_mean=standard_rate_mean,
-        model={
-            'type': BendingPowerlaw, 'period': standard_period,
-            'coherence': standard_coherence, 'variance_fraction': 0.3
-        },
-    )
-    figure_bpl: Figure = plot_lightcurve(lightcurve_bpl)
-
-    # lightcurve_lorentzian: TimeSeries = generate_synthetic_lightcurve(
-    #     campaign_length=standard_campaign_length,
-    #     observation_cadence=standard_cadence,
-    #     rate_mean=standard_rate_mean,
-    #     model={
-    #         'type': Lorentzian, 'period': standard_period,
-    #         'coherence': standard_coherence, 'variance_fraction': 0.3
-    #     },
-    # )
-    # lightcurve_mixed: TimeSeries = generate_synthetic_lightcurve(
-    #     campaign_length=standard_campaign_length,
-    #     observation_cadence=standard_cadence,
-    #     rate_mean=standard_rate_mean,
-    #     model=[
-    #         {
-    #             'type': BendingPowerlaw, 'period': standard_period,
-    #             'coherence': standard_coherence, 'variance_fraction': 0.2
-    #         },
-    #         {
-    #             'type': Lorentzian, 'period': standard_period,
-    #             'coherence': standard_coherence, 'variance_fraction': 0.2
-    #         },
-    #     ],
-    # )
-
-    soundfont_path: Path = Path(config['PATHS']['soundfonts'])
+    soundfont_path: Path = paths['soundfonts']
 
     flute_sampler: Sampler = Sampler(soundfont_path / "flute.sf2")
     flute_sampler_staccato: Sampler = copy.copy(flute_sampler)
@@ -110,18 +57,31 @@ def main():
         }
     )
 
-    sonification_bpl: Sonification = generate_sonification_from_lightcurve(
-        lightcurve=lightcurve_bpl,
-        sampler=flute_sampler_long,
-        tempo=config['SONIFICATION'].getint('tempo')
-    )
-    output_path: Path = Path(config['PATHS']['zooniverse']) / 'test' / 'lightcurve_bpl.mp3'
-    write_sonification_to_mp3(sonification_bpl, output_path=output_path)
-    figure_bpl.write_html(output_path.with_suffix('.html'))
-    write_subject_metadata_to_yaml(
-        lightcurve=lightcurve_bpl,
-        sonification_meta={'tempo': 6, 'instrument': 'Flute, staccato'},
-        output_path=output_path,
+    generate_synthetic_subjects(
+        root_path=paths['zooniverse'],
+        subject_sets={
+            'test2': {
+                'meta': {
+                    'display_name': "Test Bulk Upload",
+                },
+                'parameters': {
+                    'sampler': [
+                        ('Flute, staccato', flute_sampler_staccato),
+                        ('Flute, long', flute_sampler_long),
+                    ],
+                    'tempo': [6],
+                    'rate_mean': [25 * u.s ** -1],
+                    'observation_cadence': [TimeDelta(3, format='jd')],
+                    'campaign_length': [TimeDelta(360, format='jd')],
+                    'model_definition': [
+                        ModelDefinition(
+                            model=BendingPowerlaw, variance_fraction=0.3,
+                            coherence=5.0, period=TimeDelta(21, format='jd'),
+                        )
+                    ],
+                },
+            },
+        }
     )
 
 if __name__ == "__main__":
