@@ -28,6 +28,8 @@ dependencies = [
     "strauss",
     "decouple>=0.0.7",
     "ipython>=9.0.2",
+    "click>=8.1.8",
+    "sqlalchemy>=2.0.40",
 ]
 
 [tool.uv.sources]

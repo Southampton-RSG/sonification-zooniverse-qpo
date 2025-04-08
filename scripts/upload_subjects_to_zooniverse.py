@@ -45,13 +45,15 @@ def main():
     )
 
     zooniverse_path: Path = Path(config['PATHS']['zooniverse'])
+    subjects_path: Path = zooniverse_path / 'subjects'
+    workflows_path: Path = zooniverse_path / 'workflows'
 
     work_done: Dict = {
+        'workflows_created': 0,
         'subject_sets_created': 0,
         'subjects_created': 0,
     }
-
-    for subject_set_directory in Path(zooniverse_path).iterdir():
+    for subject_set_directory in subjects_path.iterdir():
         if subject_set_directory.is_dir():
             # Open the metadata for this subject set, saved inside the directory
             subject_set_meta_path: Path = subject_set_directory / 'meta.yaml'
@@ -83,6 +85,7 @@ def main():
                         f"{subject_set_directory}: Subject set found, Zooniverse ID: {subject_set_meta['id']}"
                     )
 
+
             if not subject_set_meta.get('id', None):
                 # There is no recorded subject set ID, so we need to create a new subject set
                 subject_set: SubjectSet = SubjectSet()
@@ -101,7 +104,7 @@ def main():
                 work_done['subject_sets_created']+= 1
 
             new_subjects: List[Subject] = []
-            for subject_file in subject_set_directory.glob('*.mp3'):
+            for subject_file in subject_set_directory.glob('*.mp4'):
                 # Open the metadata for this subject, saved next to it
                 subject_meta_path: Path = subject_file.with_suffix('.meta.yaml')
 

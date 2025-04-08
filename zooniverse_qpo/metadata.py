@@ -1,12 +1,11 @@
 import yaml
-from pathlib import Path
-from typing import Dict, Any
 from logging import getLogger, Logger
+from pathlib import Path
+from typing import Dict, Any, List
 
 from astropy import units as u
-from astropy.time import TimeDelta
-from astropy.timeseries import TimeSeries
-from astropy.units import Quantity
+from astropy.time import TimeBase
+from astropy.units import Quantity, UnitBase
 
 
 logger: Logger = getLogger(__name__)
@@ -28,19 +27,28 @@ def write_subject_metadata_to_yaml(
     with output_path.with_suffix('.yaml').open('w') as output_file:
         # We wrap everything in string conversion as Astropy converts things into numerical-but-still-fancy types
         # And yaml dumps them out as a mess.
-        metadata: Dict[str, Any] = parameters.copy()
+        metadata: Dict[str, Any] = {}
 
-        campaign_length: TimeDelta|None = metadata.pop("campaign_length", None)
-        observation_cadence: TimeDelta|None = metadata.pop("observation_cadence", None)
-        observation_count: int|None = metadata.pop("observation_count", None)
+        for key, value in parameters.items():
+            if isinstance(value, TimeBase):
+                metadata[key] = f"{parameters[key].to(u.day)}"
 
-        metadata['name'] = name
-        metadata['instrument'] = metadata.pop('sampler')[0]
-        metadata['rate_mean'] = f"{metadata.pop('rate_mean')}"
-        metadata['campaign_length'] = f"{campaign_length.to(u.day)}" if campaign_length else None
-        metadata['observation_count'] = observation_count
-        metadata['observation_cadence'] = f"{observation_cadence.to(u.day)}" if observation_cadence else None
-        metadata.update(metadata.pop('model_definition').to_metadata())
+            elif isinstance(value, dict):
+                # We ignore things like units and column mapping
+                pass
+
+            elif isinstance(value, Quantity) or isinstance(value, UnitBase) or isinstance(value, Path):
+                logger.debug(f"Converting {key}: {value}")
+                metadata[key] = f"{parameters[key]}"
+
+            elif key == 'sampler':
+                metadata[key] = parameters[key][0]
+            elif key == 'model_definition':
+                metadata.update(
+                    parameters[key].to_metadata()
+                )
+            else:
+                metadata[key] = value
 
         logger.debug(
             f"Writing metadata to YAML file:\n{metadata}"

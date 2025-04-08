@@ -114,6 +114,8 @@ class ModelDefinition(ModelDefinitionBase):
         """
         return self.period
 
+
+@dataclass
 class ModelComposite(ModelDefinitionBase):
     """
     A composite model consisting of many components.

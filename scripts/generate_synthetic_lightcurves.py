@@ -9,13 +9,11 @@ from typing import Any, Dict
 
 from astropy import units as u
 from astropy.time import TimeDelta
-
-from mind_the_gaps.models.psd_models import BendingPowerlaw
-
+from mind_the_gaps.models.psd_models import BendingPowerlaw, Lorentzian
 from strauss.generator import Sampler
 
-from zooniverse_qpo.synthetic import generate_synthetic_subjects
-from zooniverse_qpo.model_definition import ModelDefinition
+from zooniverse_qpo.subject.output import generate_synthetic_subject_data
+from zooniverse_qpo.model_definition import ModelDefinition, ModelComposite
 
 
 def main():
@@ -57,27 +55,65 @@ def main():
         }
     )
 
-    generate_synthetic_subjects(
-        root_path=paths['zooniverse'],
+    generate_synthetic_subject_data(
+        root_path=paths['zooniverse'] / 'subjects',
         subject_sets={
-            'test2': {
+            'flute_staccato': {
                 'meta': {
-                    'display_name': "Test Bulk Upload",
+                    'display_name': "Flute, Staccato",
                 },
                 'parameters': {
-                    'sampler': [
-                        ('Flute, staccato', flute_sampler_staccato),
-                        ('Flute, long', flute_sampler_long),
-                    ],
-                    'tempo': [6],
-                    'rate_mean': [25 * u.s ** -1],
-                    'observation_cadence': [TimeDelta(3, format='jd')],
-                    'campaign_length': [TimeDelta(360, format='jd')],
+                    'sampler': ('Flute, staccato', flute_sampler_staccato),
+                    'repeats': [0],
+                    'tempo': 4,
+                    'rate_mean': 25 * u.s ** -1,
+                    'observation_cadence': TimeDelta(3, format='jd'),
+                    'campaign_length': TimeDelta(360, format='jd'),  # ~17 periods
                     'model_definition': [
                         ModelDefinition(
-                            model=BendingPowerlaw, variance_fraction=0.3,
+                            model=BendingPowerlaw, variance_fraction=0.4,
                             coherence=5.0, period=TimeDelta(21, format='jd'),
-                        )
+                        ),
+                        ModelComposite(
+                            model_components=[
+                                ModelDefinition(
+                                    model=BendingPowerlaw, variance_fraction=0.3,
+                                    coherence=5.0, period=TimeDelta(21, format='jd'),
+                                ),
+                                ModelDefinition(
+                                    model=Lorentzian, variance_fraction=0.1,
+                                    coherence=5.0, period=TimeDelta(21, format='jd'),
+                                ),
+                            ]
+                        ),
+                        ModelComposite(
+                            model_components=[
+                                ModelDefinition(
+                                    model=BendingPowerlaw, variance_fraction=0.2,
+                                    coherence=5.0, period=TimeDelta(21, format='jd'),
+                                ),
+                                ModelDefinition(
+                                    model=Lorentzian, variance_fraction=0.2,
+                                    coherence=5.0, period=TimeDelta(21, format='jd'),
+                                ),
+                            ]
+                        ),
+                        ModelComposite(
+                            model_components=[
+                                ModelDefinition(
+                                    model=BendingPowerlaw, variance_fraction=0.1,
+                                    coherence=5.0, period=TimeDelta(21, format='jd'),
+                                ),
+                                ModelDefinition(
+                                    model=Lorentzian, variance_fraction=0.3,
+                                    coherence=5.0, period=TimeDelta(21, format='jd'),
+                                ),
+                            ]
+                        ),
+                        ModelDefinition(
+                            model=Lorentzian, variance_fraction=0.4,
+                            coherence=5.0, period=TimeDelta(21, format='jd'),
+                        ),
                     ],
                 },
             },

@@ -11,7 +11,7 @@ from strauss.generator import Sampler
 from strauss.sources import Objects, Events
 from strauss.sonification import Sonification
 
-from moviepy import AudioFileClip
+from moviepy import AudioFileClip, VideoFileClip,ColorClip
 
 
 # C-Major pentatonic, from Strauss example
@@ -73,4 +73,30 @@ def write_sonification_to_mp3(soni: Sonification, output_path: Path):
 
     soni.save(fname=path_wav)
     AudioFileClip(path_wav).write_audiofile(path_mp3, codec='mp3')
+    path_wav.unlink()
+
+
+def write_sonification_to_mp4(soni: Sonification, output_path: Path):
+    """
+
+    :param soni:
+    :param output_directory:
+    :return:
+    """
+    path_wav: Path = output_path.with_suffix('.wav')
+    path_mp4: Path = output_path.with_suffix('.mp4')
+
+    soni.save(fname=path_wav)
+    audio: AudioFileClip = AudioFileClip(path_wav)
+    video: ColorClip = ColorClip(
+        size=(256,1),
+        color=(0,0,0),
+        duration=audio.duration
+    )
+    video.audio = audio
+    video.write_videofile(
+        filename=path_mp4,
+        fps=60
+    )
+
     path_wav.unlink()
